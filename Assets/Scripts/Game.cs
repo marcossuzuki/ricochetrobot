@@ -5,7 +5,8 @@ using System.Linq;
 using UnityEngine.UI;
 
 public class Game : MonoBehaviour {
-    
+
+
     public struct History
     {
         public string color;
@@ -24,20 +25,20 @@ public class Game : MonoBehaviour {
     public Dictionary<string, int> robots;
     public Dictionary<string, string> dText = new Dictionary<string, string>()
     {
-        {"N", "↑"},
-        {"S", "↓"},
-        {"W", "←"},
-        {"E", "→" }
+        {"N", "N"},
+        {"S", "S"},
+        {"W", "W"},
+        {"E", "E" }
     };
+    public static List<int> center = new List<int> { 119, 120, 135, 136 };
     public string token;
-    public Board board;
     public int moves;
     public string[] last;
     public string activeRobot = "";
     public string direction = "";
 
-    public Text movesText;
-    public Text historyText;
+    public Text movesUI;
+    public Text historyUI;
     public bool solved = false;
     public GameObject finishMsg;
 
@@ -51,11 +52,16 @@ public class Game : MonoBehaviour {
             instance = this;
         else if (instance != this)
             Destroy(gameObject);
-
-        movesText = GameObject.Find("Moves_text").GetComponent<Text>();
-        historyText = GameObject.Find("History_text").GetComponent<Text>();
-        finishMsg = GameObject.Find("FinishMsg");
-        finishMsg.SetActive(false);
+        try
+        {
+            movesUI = GameObject.Find("Moves_text").GetComponent<Text>();
+            historyUI = GameObject.Find("History_text").GetComponent<Text>();
+            finishMsg = GameObject.Find("FinishMsg");
+            finishMsg.SetActive(false);
+        }
+        catch { }
+        
+        
     }
 #endregion
 
@@ -72,10 +78,9 @@ public class Game : MonoBehaviour {
             {Board.colors[4], 0 }
         };
         List<int> used = new List<int>();
-        List<int> centro = new List<int> { 119, 120, 135, 136 };
         List<string> tokens = new List<string>();
 
-        foreach (string t in board.tokens)
+        foreach (string t in Board.instance.tokens)
             tokens.Add(t);
 
         int index;
@@ -87,10 +92,10 @@ public class Game : MonoBehaviour {
             {       
                 index = rnd.Next(0, 256);
 
-                if (centro.Contains(index))
+                if (center.Contains(index))
                     continue;
 
-                string gridToken = board.grid[index];
+                string gridToken = Board.instance.grid[index];
                 gridToken = gridToken.Substring(Math.Max(0, gridToken.Length - 2));
                 if (tokens.Contains(gridToken))
                     continue;
@@ -119,14 +124,14 @@ public class Game : MonoBehaviour {
 
     public bool canMove(string color, string direction)
     {
-        if (last[0] == color && last[1] == board.reverse[direction])
+        if (verifyLast(color, Board.reverse[direction]))
             return false;
 
         int index = robots[color];
-        if (board.grid[index].Contains(direction))
+        if (Board.instance.grid[index].Contains(direction))
             return false;
 
-        int newIndex = index + board.offset[direction];
+        int newIndex = index + Board.offset[direction];
         if(robots.ContainsValue(newIndex))
             return false;
 
@@ -138,10 +143,10 @@ public class Game : MonoBehaviour {
         int index = robots[color];
         while (true)
         {
-            if (board.grid[index].Contains(direction))
+            if (Board.instance.grid[index].Contains(direction))
                 break;
 
-            int newIndex = index + board.offset[direction];
+            int newIndex = index + Board.offset[direction];
             if (robots.ContainsValue(newIndex))
                 break;
 
@@ -151,26 +156,26 @@ public class Game : MonoBehaviour {
         return index;
     }
 
-    public void doMove(string color, string direction)
+    public History doMove(string color, string direction)
     {
         if(!canMove(color, direction))
-            return;
+            return new History();
 
         int start = robots[color];
 
-        if (last[0] == color && last[1] == board.reverse[direction])
-            return;
+        if (verifyLast(color, Board.reverse[direction]))
+            return new History();
 
         int end = computeMove(color, direction);
         if (start == end)
-            return;
+            return new History();
 
-        last[0] = color;
-        last[1] = direction;
-        updateMoves(++moves);
+        updateLast(color, direction);
+        updateMoves(moves+1);
         robots[color] = end;
         addListMoves(color, direction);
         histories.Add(new History(color, direction, start));
+        return new History(color, direction, start);
     }
 
     public void undoMove()
@@ -179,9 +184,8 @@ public class Game : MonoBehaviour {
         {
             History undo = histories.Last();
 
-            updateMoves(--moves);
-            last[0] = undo.color;
-            last[1] = undo.direction;
+            updateMoves(moves-1);
+            updateLast(undo.color, undo.direction);
             robots[undo.color] = undo.start;
 
             int index = histories.LastIndexOf(undo);
@@ -190,25 +194,46 @@ public class Game : MonoBehaviour {
         }
     }
 
+    public  List<string[]> getMoves(string[] colors)
+    {
+        List<string[]> result = new List<string[]>();
+        foreach (string c in colors)
+            foreach (string d in Board.directions)
+                if (canMove(c, d))
+                    result.Add(new string[2] {c, d});
+
+        return result;
+    }
+
     public bool over()
     {
         string color = token[0].ToString();
 
-        return board.grid[robots[color]].Contains(token);
+        return Board.instance.grid[robots[color]].Contains(token);
     }
 
     public bool newGame()
     {
-        board.newBoard();
-        token = board.token;
+        Board.instance.newBoard();
+        token = Board.instance.token;
         updateMoves(0);
         last = new string[2] { "", "" };
         histories.Clear();
         listMoves.Clear();
-        updateHistoryText();
+        updateHistoryMsg();
         robots = PlaceRobots();
         RenderBoard.instance.generateWall();
         RenderBoard.instance.positionRobots();
+        try
+        {
+            IAGame.instance.robots = new Dictionary<string, int>(robots);
+            IAGame.instance.token = token;
+            IAGame.instance.histories.Clear();
+            IAGame.instance.last = last;
+            IABoard.instance.grid = Board.instance.grid;
+            IABoard.instance.token = Board.instance.token;
+        }
+        catch { }
         return true;
     }
 
@@ -224,7 +249,6 @@ public class Game : MonoBehaviour {
             }
             else if (Input.GetKeyUp("t"))
             {
-                Debug.Log("passei aqui");
                 while(histories.Count>0)
                     undoMove();
                 RenderBoard.instance.positionRobots();
@@ -258,9 +282,11 @@ public class Game : MonoBehaviour {
             activeRobot = "";
         }
         else if (Input.GetKeyUp("n"))
-            while (!newGame());
+            while (!newGame()) ;
+        else if (Input.GetKeyUp("s"))
+            Solver.instance.solve(IAGame.instance);
             
-        
+
 
 
         if (activeRobot != "")
@@ -285,31 +311,46 @@ public class Game : MonoBehaviour {
 
     public void updateMoves(int m)
     {
-        moves = m;
-        movesText.text = "Moves: " + moves;
+        try
+        {
+            moves = m;
+            movesUI.text = "Moves: " + moves;
+        }catch{ }
     }
 
     public void addListMoves(string color, string direction)
     {
         listMoves.Add(color + dText[direction]);
-        updateHistoryText();
-        //listMoves.RemoveAt(listMoves.Count - 1);
+        updateHistoryMsg();
     }
 
     public void removeLastListMoves()
     {
         listMoves.RemoveAt(listMoves.Count - 1);
-        updateHistoryText();
+        updateHistoryMsg();
     }
 
 
-    public void updateHistoryText()
+    public void updateHistoryMsg()
     {
-        historyText.text = "";
-        foreach (string s in listMoves)
+        try
         {
-            historyText.text += s + "  ";
+            historyUI.text = "";
+            foreach (string s in listMoves)
+                historyUI.text += s + "  ";
         }
+        catch { }
+    }
+
+    public void updateLast(string color, string direction)
+    {
+        last[0] = color;
+        last[1] = direction;
+    }
+
+    public bool verifyLast(string color, string direction)
+    {
+        return (last[0] == color && last[1] == direction);
     }
 
     public void Update()

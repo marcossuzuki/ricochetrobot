@@ -8,6 +8,7 @@ public class Animate : MonoBehaviour {
     Animator animator;
     public float speed;
     private float time = 0f;
+    private AudioSource audio;
 
     public void Move(int start, int end)
     {
@@ -24,7 +25,7 @@ public class Animate : MonoBehaviour {
 
     IEnumerator run(Vector3 direction, Vector3 end)
     {
-
+        audio.enabled = true;
         while(Vector3.Magnitude(end - gameObject.transform.position)> 0.1)
         {
             time += Time.deltaTime;
@@ -39,12 +40,14 @@ public class Animate : MonoBehaviour {
         time = 0f;
         RenderBoard.instance.positionRobots();
         animator.SetBool("move", false);
+        audio.enabled = false;
     }
 
     private void Awake()
     {
         animator = gameObject.GetComponent<Animator>();
-
+        audio = gameObject.GetComponent<AudioSource>();
+        audio.enabled = false;
     }
 
     // Use this for initialization

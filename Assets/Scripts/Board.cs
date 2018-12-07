@@ -23,8 +23,8 @@ public class Board: MonoBehaviour
     static string SOUTH = "S";
     static string WEST = "W";
 
-    //static string[] directions = { NORTH, EAST, SOUTH, WEST };
-    public Dictionary<string, string> reverse = new Dictionary<string, string>()
+    public static string[] directions = { NORTH, EAST, SOUTH, WEST };
+    public static Dictionary<string, string> reverse = new Dictionary<string, string>()
         {
             { NORTH, SOUTH },
             { EAST,  WEST  },
@@ -32,7 +32,7 @@ public class Board: MonoBehaviour
             { WEST,  EAST  }
         };
 
-    public Dictionary<string, int> offset = new Dictionary<string, int>()
+    public static Dictionary<string, int> offset = new Dictionary<string, int>()
         {
             { NORTH,-16 },
             { SOUTH, 16 },
