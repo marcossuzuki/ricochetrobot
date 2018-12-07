@@ -283,10 +283,10 @@ public class Game : MonoBehaviour {
         }
         else if (Input.GetKeyUp("n"))
             while (!newGame()) ;
-        else if (Input.GetKeyUp("s"))
+       /* else if (Input.GetKeyUp("s"))
             Solver.instance.solve(IAGame.instance);
             
-
+    */
 
 
         if (activeRobot != "")
