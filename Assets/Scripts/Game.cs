@@ -124,8 +124,8 @@ public class Game : MonoBehaviour {
 
     public bool canMove(string color, string direction)
     {
-        if (verifyLast(color, Board.reverse[direction]))
-            return false;
+        //if (verifyLast(color, Board.reverse[direction]))
+        //    return false;
 
         int index = robots[color];
         if (Board.instance.grid[index].Contains(direction))
@@ -163,8 +163,8 @@ public class Game : MonoBehaviour {
 
         int start = robots[color];
 
-        if (verifyLast(color, Board.reverse[direction]))
-            return new History();
+        //if (verifyLast(color, Board.reverse[direction]))
+        //    return new History();
 
         int end = computeMove(color, direction);
         if (start == end)
@@ -283,10 +283,10 @@ public class Game : MonoBehaviour {
         }
         else if (Input.GetKeyUp("n"))
             while (!newGame()) ;
-       /* else if (Input.GetKeyUp("s"))
+        else if (Input.GetKeyUp("s"))
             Solver.instance.solve(IAGame.instance);
             
-    */
+    
 
 
         if (activeRobot != "")
@@ -350,7 +350,10 @@ public class Game : MonoBehaviour {
 
     public bool verifyLast(string color, string direction)
     {
-        return (last[0] == color && last[1] == direction);
+        int index = histories.Count - 1;
+        if (index == 1)
+            return false;
+        return (histories[index].color == color && histories[index].direction == direction);
     }
 
     public void Update()
