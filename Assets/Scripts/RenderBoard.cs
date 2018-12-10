@@ -22,10 +22,10 @@ public class RenderBoard : MonoBehaviour {
     public Dictionary<string,GameObject> robotRender = null;
     public GameObject wall = null;
     public GameObject token = null;
-    public int[] lastIndex = new int[5];
+    //public int[] lastIndex = new int[5];
 
-    public Game game;
     public Board board;
+    public Game game;
 
     public static RenderBoard instance = null;
 
@@ -33,7 +33,6 @@ public class RenderBoard : MonoBehaviour {
     {
         game = FindObjectOfType<Game>();
         board = FindObjectOfType<Board>();
-
         if (instance == null)
             instance = this;
         else if (instance != this)
@@ -100,7 +99,7 @@ public class RenderBoard : MonoBehaviour {
                         }
                         wallTmp.transform.parent = wall.transform;
                     }
-                    else if(board.grid[j * 16 + i].Contains(game.token) && !isInstToken) //create token
+                    else if(board.grid[j * 16 + i].Contains(Game.instance.token) && !isInstToken)
                     {
                         createToken(j * 16 + i);
                         isInstToken = true;
@@ -114,23 +113,26 @@ public class RenderBoard : MonoBehaviour {
         if (token != null)
             Destroy(token);
 
-        if (board.grid[index].Contains("C"))
+        string[] grid = board.grid;
+
+        if (grid[index].Contains("C"))
             token = Instantiate<GameObject>(shapeCirclePrefab);
-        else if (board.grid[index].Contains("Q"))
+        else if (grid[index].Contains("Q"))
             token = Instantiate<GameObject>(shapeSquarePrefab);
-        else if (board.grid[index].Contains("T"))
+        else if (grid[index].Contains("T"))
             token = Instantiate<GameObject>(shapeTrianglePrefab);
-        else if (board.grid[index].Contains("H"))
+        else if (grid[index].Contains("H"))
             token = Instantiate<GameObject>(shapeHexagonPrefab);
 
-        if (board.grid[index].Contains("R"))
+        if (grid[index].Contains("R"))
             token.GetComponent<MeshRenderer>().material.SetColor("_Color", Color.red);
-        else if (board.grid[index].Contains("G"))
+        else if (grid[index].Contains("G"))
             token.GetComponent<MeshRenderer>().material.SetColor("_Color", Color.green);
-        else if (board.grid[index].Contains("B"))
+        else if (grid[index].Contains("B"))
             token.GetComponent<MeshRenderer>().material.SetColor("_Color", Color.blue);
-        else if (board.grid[index].Contains("Y"))
+        else if (grid[index].Contains("Y"))
             token.GetComponent<MeshRenderer>().material.SetColor("_Color", Color.yellow);
+
         token.name = "Token";
         int[] pos = indexToXY(index);
         token.transform.position = new Vector3(pos[0], 0.5f, 15 - pos[1]);
@@ -143,7 +145,7 @@ public class RenderBoard : MonoBehaviour {
         if (robotRender == null)
         {
             robotRender = new Dictionary<string, GameObject>();
-            foreach (string c in game.robots.Keys)
+            foreach (string c in Game.instance.robots.Keys)
             {
                 GameObject robotsTmp = null;
                 if (c == "R")
@@ -158,7 +160,7 @@ public class RenderBoard : MonoBehaviour {
                     robotsTmp = Instantiate<GameObject>(robotsPrefab_W);
 
                 robotsTmp.name = "Robot_" + c;
-                int index = game.robots[c];
+                int index = Game.instance.robots[c];
                 int[] pos = Board.Posxy(index, 16);
                 robotsTmp.transform.position = new Vector3(pos[0], 0, 15 - pos[1]);
                 robotsTmp.transform.parent = transform;
@@ -167,9 +169,9 @@ public class RenderBoard : MonoBehaviour {
             }
         }
         else
-            foreach (string c in game.robots.Keys)
+            foreach (string c in Game.instance.robots.Keys)
             {
-                int index = game.robots[c];
+                int index = Game.instance.robots[c];
                 int[] pos = indexToXY(index);
                 robotRender[c].transform.position = new Vector3(pos[0], 0, 15 - pos[1]);
                 robotRender[c].transform.parent = transform;
@@ -182,14 +184,13 @@ public class RenderBoard : MonoBehaviour {
     public void clearTrail(GameObject g)
     {
         g.GetComponentInChildren<TrailRenderer>().Clear();
-        //g.GetComponent<TrailRenderer>().enabled = true;
     }
 
         
     // Use this for initialization
     void Start () {
 
-        while (!game.newGame());
+        while (!Game.instance.newGame());
 
         generateGround();
         generateWall();
@@ -197,9 +198,4 @@ public class RenderBoard : MonoBehaviour {
 
     }
 	
-	// Update is called once per frame
-	void Update () {
-        
-        //positionRobots();
-    }
 }

@@ -6,23 +6,22 @@ public class DungeonCam : MonoBehaviour {
 	public Transform player;
 	Vector3 offset;
 	public float damping = 1;
-
     public string playerColor;
 
 	// Use this for initialization
 	void Start () {
         offset = new Vector3(0f, 0f, -2f);
-
     }
-	
-	// Update is called once per frame
-	void Update () {
-        if (Game.instance.activeRobot != playerColor && Game.instance.activeRobot!="")
-        {
-            playerColor = Game.instance.activeRobot;
-            player = RenderBoard.instance.robotRender[playerColor].transform;
 
-        }
+    // Update is called once per frame
+    void Update() {
+        try { 
+            if (Game.instance.activeRobot != playerColor && Game.instance.activeRobot != "")
+            {
+                playerColor = Game.instance.activeRobot;
+                player = RenderBoard.instance.robotRender[playerColor].transform;
+            }
+        }catch{}
 
         if (player != null) { 
 
@@ -34,7 +33,5 @@ public class DungeonCam : MonoBehaviour {
             transform.LookAt(player);
 
         }
-
-
     }
 }

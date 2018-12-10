@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.1730693, g: 0.14822713, b: 0.14444438, a: 1}
+  m_IndirectSpecularColor: {r: 0.17319196, g: 0.14822909, b: 0.14424184, a: 1}
 --- !u!157 &3
 LightmapSettings:
   m_ObjectHideFlags: 0
@@ -1298,9 +1298,8 @@ MonoBehaviour:
     type: 2}
   wall: {fileID: 0}
   token: {fileID: 0}
-  lastIndex: 0000000000000000000000000000000000000000
-  game: {fileID: 0}
   board: {fileID: 0}
+  game: {fileID: 0}
 --- !u!4 &1103670943
 Transform:
   m_ObjectHideFlags: 0
@@ -1545,6 +1544,8 @@ GameObject:
   - component: {fileID: 2080427550}
   - component: {fileID: 2080427549}
   - component: {fileID: 2080427548}
+  - component: {fileID: 2080427545}
+  - component: {fileID: 2080427544}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -1552,6 +1553,93 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
+--- !u!81 &2080427544
+AudioListener:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 2080427543}
+  m_Enabled: 1
+--- !u!82 &2080427545
+AudioSource:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 2080427543}
+  m_Enabled: 1
+  serializedVersion: 4
+  OutputAudioMixerGroup: {fileID: 0}
+  m_audioClip: {fileID: 8300000, guid: c35f2acc79c6b4b48b7ec525bf11169c, type: 3}
+  m_PlayOnAwake: 1
+  m_Volume: 0.3
+  m_Pitch: 1
+  Loop: 1
+  Mute: 0
+  Spatialize: 0
+  SpatializePostEffects: 0
+  Priority: 128
+  DopplerLevel: 1
+  MinDistance: 1
+  MaxDistance: 500
+  Pan2D: 0
+  rolloffMode: 0
+  BypassEffects: 0
+  BypassListenerEffects: 0
+  BypassReverbZones: 0
+  rolloffCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 2
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+    - serializedVersion: 2
+      time: 1
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  panLevelCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 2
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 0
+  spreadCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 2
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  reverbZoneMixCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 2
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 0
 --- !u!20 &2080427546
 Camera:
   m_ObjectHideFlags: 0
@@ -1664,6 +1752,7 @@ MonoBehaviour:
   direction: 
   movesUI: {fileID: 0}
   historyUI: {fileID: 0}
+  IAUI: {fileID: 0}
   solved: 0
   finishMsg: {fileID: 0}
   robotsIndex: 0000000000000000000000000000000000000000

@@ -21,6 +21,7 @@ public class Game : MonoBehaviour {
     };
     
     public List<History> histories = new List<History>();
+    public List<string[]> solution = new List<string[]>();
     public List<string> listMoves = new List<string>();
     public Dictionary<string, int> robots;
     public Dictionary<string, string> dText = new Dictionary<string, string>()
@@ -39,6 +40,7 @@ public class Game : MonoBehaviour {
 
     public Text movesUI;
     public Text historyUI;
+    public Text IAUI;
     public bool solved = false;
     public GameObject finishMsg;
 
@@ -56,6 +58,7 @@ public class Game : MonoBehaviour {
         {
             movesUI = GameObject.Find("Moves_text").GetComponent<Text>();
             historyUI = GameObject.Find("History_text").GetComponent<Text>();
+            IAUI = GameObject.Find("IA_text").GetComponent<Text>();
             finishMsg = GameObject.Find("FinishMsg");
             finishMsg.SetActive(false);
         }
@@ -163,9 +166,6 @@ public class Game : MonoBehaviour {
 
         int start = robots[color];
 
-        //if (verifyLast(color, Board.reverse[direction]))
-        //    return new History();
-
         int end = computeMove(color, direction);
         if (start == end)
             return new History();
@@ -194,21 +194,9 @@ public class Game : MonoBehaviour {
         }
     }
 
-    public  List<string[]> getMoves(string[] colors)
-    {
-        List<string[]> result = new List<string[]>();
-        foreach (string c in colors)
-            foreach (string d in Board.directions)
-                if (canMove(c, d))
-                    result.Add(new string[2] {c, d});
-
-        return result;
-    }
-
     public bool over()
     {
         string color = token[0].ToString();
-
         return Board.instance.grid[robots[color]].Contains(token);
     }
 
@@ -226,6 +214,8 @@ public class Game : MonoBehaviour {
         RenderBoard.instance.positionRobots();
         try
         {
+            solution.Clear();
+            updateIAMsg();
             IAGame.instance.robots = new Dictionary<string, int>(robots);
             IAGame.instance.token = token;
             IAGame.instance.histories.Clear();
@@ -257,13 +247,18 @@ public class Game : MonoBehaviour {
             }
             return;
         }
-            
 
-        foreach (string c in RenderBoard.instance.robotRender.Keys)
+        try
         {
-            if (RenderBoard.instance.robotRender[c].GetComponent<Animator>().GetBool("move") == true)
-                return;
+            foreach (string c in RenderBoard.instance.robotRender.Keys)
+            {
+            
+                if (RenderBoard.instance.robotRender[c].GetComponent<Animator>().GetBool("move") == true)
+                    return;
+            
+            }
         }
+        catch { }
 
         if (Input.GetKeyUp("b"))
             activeRobot = "B";
@@ -284,10 +279,11 @@ public class Game : MonoBehaviour {
         else if (Input.GetKeyUp("n"))
             while (!newGame()) ;
         else if (Input.GetKeyUp("s"))
-            Solver.instance.solve(IAGame.instance);
+        {
+            solution = Solver.instance.solve(IAGame.instance);
+            updateIAMsg();
+        }
             
-    
-
 
         if (activeRobot != "")
         {
@@ -342,6 +338,17 @@ public class Game : MonoBehaviour {
         catch { }
     }
 
+    public void updateIAMsg()
+    {
+        try
+        {
+            IAUI.text = "";
+            foreach (string[] s in solution)
+                IAUI.text += s[0] + s[1] + "  ";
+        }
+        catch { }
+    }
+
     public void updateLast(string color, string direction)
     {
         last[0] = color;
@@ -350,26 +357,29 @@ public class Game : MonoBehaviour {
 
     public bool verifyLast(string color, string direction)
     {
-        int index = histories.Count - 1;
-        if (index == 1)
-            return false;
-        return (histories[index].color == color && histories[index].direction == direction);
+        return (last[0] == color && last[1] == direction);
     }
 
     public void Update()
     {
         keyPress();
         int i = 0;
-        foreach (string k in robots.Keys)
+        try
         {
-            robotsIndex[i] = robots[k];
-            i++;
+            foreach (string k in robots.Keys)
+            {
+                robotsIndex[i] = robots[k];
+                i++;
+            }
+       
+
+            if (over() && !solved)
+            {
+                solved = true;
+                finishMsg.SetActive(true);
+            }
         }
-        if (over() && !solved)
-        {
-            solved = true;
-            finishMsg.SetActive(true);
-        }
+        catch { }
     }
 
 }

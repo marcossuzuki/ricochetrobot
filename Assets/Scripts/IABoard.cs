@@ -23,20 +23,20 @@ public class IABoard : MonoBehaviour {
 
     public static string[] directions = { NORTH, EAST, SOUTH, WEST };
     public static Dictionary<string, string> reverse = new Dictionary<string, string>()
-        {
-            { NORTH, SOUTH },
-            { EAST,  WEST  },
-            { SOUTH, NORTH },
-            { WEST,  EAST  }
-        };
+    {
+        { NORTH, SOUTH },
+        { EAST,  WEST  },
+        { SOUTH, NORTH },
+        { WEST,  EAST  }
+    };
 
     public static Dictionary<string, int> offset = new Dictionary<string, int>()
-        {
-            { NORTH,-16 },
-            { SOUTH, 16 },
-            { EAST,  1  },
-            { WEST, -1  }
-        };
+    {
+        { NORTH,-16 },
+        { SOUTH, 16 },
+        { EAST,  1  },
+        { WEST, -1  }
+    };
     #endregion
 
     #region cores

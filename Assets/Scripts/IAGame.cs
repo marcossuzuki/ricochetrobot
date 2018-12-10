@@ -47,8 +47,8 @@ public class IAGame : MonoBehaviour {
 
     public bool canMove(string color, string direction)
     {
-        if (verifyLast(color, IABoard.reverse[direction]))
-            return false;
+        //if (verifyLast(color, IABoard.reverse[direction]))
+        //    return false;
 
         int index = robots[color];
         if (IABoard.instance.grid[index].Contains(direction))
@@ -78,24 +78,21 @@ public class IAGame : MonoBehaviour {
         return index;
     }
 
-    public History doMove(string color, string direction)
+    public string[] doMove(string color, string direction)
     {
         if (!canMove(color, direction))
-            return new History();
+            return null;
 
         int start = robots[color];
-
-        if (verifyLast(color, IABoard.reverse[direction]))
-            return new History();
-
+        
         int end = computeMove(color, direction);
         if (start == end)
-            return new History();
+            return null;
 
         updateLast(color, direction);
         robots[color] = end;
         histories.Add(new History(color, direction, start));
-        return new History(color, direction, start);
+        return new string[2] { color, direction};
     }
 
     public void undoMove()
@@ -137,9 +134,7 @@ public class IAGame : MonoBehaviour {
 
     public bool verifyLast(string color, string direction)
     {
-        if(last.Length > 0)
-            return (last[0] == color && last[1] == direction);
-        return false;
+        return (last[0] == color && last[1] == direction);
     }
 
 }
